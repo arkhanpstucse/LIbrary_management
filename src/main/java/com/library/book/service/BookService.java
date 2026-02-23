@@ -84,4 +84,11 @@ public class BookService {
 
         return new PublicationSummary(publication, totalBooks, totalAvailableCopies);
     }
+
+    // NEW METHOD: Get total number of books by genre
+    public long getTotalBooksByGenre(Book.Genre genre) {
+        return bookRepository.findAll().stream()
+                .filter(book -> book.getGenre() == genre)
+                .count();
+    }
 }

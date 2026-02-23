@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/books")
@@ -92,5 +94,24 @@ public class BookController {
     public ResponseEntity<PublicationSummary> getPublicationSummary(@PathVariable String publication) {
         PublicationSummary summary = bookService.getPublicationSummary(publication);
         return new ResponseEntity<>(summary, HttpStatus.OK);
+    }
+
+    // 10. NEW ENDPOINT: GET /api/books/genre/{genre}/total - Get total number of books by genre
+    @GetMapping("/genre/{genre}/total")
+    public ResponseEntity<Map<String, Object>> getTotalBooksByGenre(@PathVariable String genre) {
+        try {
+            Book.Genre genreEnum = Book.Genre.valueOf(genre.toUpperCase());
+            long totalBooks = bookService.getTotalBooksByGenre(genreEnum);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("genre", genreEnum.toString());
+            response.put("totalBooks", totalBooks);
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Invalid genre. Valid genres are: FICTION, SCIENCE_FICTION, NON_FICTION, FANTASY");
+            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        }
     }
 }
